@@ -1,4 +1,6 @@
 ---
+# TODO: Use ansible git module
+
 - hosts: all
   gather_facts: false
   vars:
