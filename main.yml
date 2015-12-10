@@ -1,0 +1,44 @@
+---
+- hosts: all
+  gather_facts: false
+  vars:
+    cmd_diff: git diff-tree -p master:./ jenkins-playbooks:test/utils/ansible-playbook_integration_runner/roles/ansible_test_deps/ 
+  tasks:
+    - shell: rm -rf ansible_test_deps
+    - shell: git clone git@github.com:chrismeyersfsu/ansible_test_deps.git
+    - shell: git remote add chrismeyersfsu-ansible git@github.com:chrismeyersfsu/ansible.git
+      args:
+        chdir: ansible_test_deps
+    - shell: git fetch chrismeyersfsu-ansible
+      args:
+        chdir: ansible_test_deps
+    - shell: git checkout -b jenkins-playbooks chrismeyersfsu-ansible/jenkins-playbooks
+      args:
+        chdir: ansible_test_deps
+    - shell: git checkout master
+      args:
+        chdir: ansible_test_deps
+    - shell: "{{ cmd_diff }}"
+      args:
+        chdir: ansible_test_deps
+      register: r_diff
+
+    - shell: "{{ cmd_diff }} | git apply"
+      args:
+        chdir: ansible_test_deps
+      when: r_diff.stdout != ""
+
+    - shell: git add .
+      args:
+        chdir: ansible_test_deps
+      when: r_diff.stdout != ""
+      
+    - shell: git commit -m "auto sync"
+      args:
+        chdir: ansible_test_deps
+      when: r_diff.stdout != ""
+
+    - shell: git push
+      args:
+        chdir: ansible_test_deps
+      when: r_diff.stdout != ""
