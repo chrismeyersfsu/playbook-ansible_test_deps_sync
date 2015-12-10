@@ -1,5 +1,6 @@
 ---
 # TODO: Use ansible git module
+# TODO: Use git sub-tree to preserve history
 
 - hosts: all
   gather_facts: false
