@@ -3,6 +3,8 @@
   gather_facts: false
   vars:
     cmd_diff: git diff-tree -p master:./ jenkins-playbooks:test/utils/ansible-playbook_integration_runner/roles/ansible_test_deps/ 
+    git_env:
+      GIT_SSH: "{{ playbook_dir }}/ssh"
   tasks:
     - shell: rm -rf ansible_test_deps
 
@@ -10,13 +12,15 @@
 
     - shell: chmod +x ssh
 
-    - shell: GIT_SSH='./ssh' git clone git@github.com:chrismeyersfsu/ansible_test_deps.git
+    - shell: git clone git@github.com:chrismeyersfsu/ansible_test_deps.git
+      environment: git_env
 
     - shell: git remote add chrismeyersfsu-ansible git@github.com:chrismeyersfsu/ansible.git
       args:
         chdir: ansible_test_deps
 
     - shell: git fetch chrismeyersfsu-ansible
+      environment: git_env
       args:
         chdir: ansible_test_deps
 
